@@ -9,7 +9,7 @@ public class ItemForm {
 		return this.name;
 	}
 	
-	public void setName() {
+	public void setName(String name) {
 		this.name=name;
 	}
 	
@@ -17,7 +17,7 @@ public class ItemForm {
 		return this.price;
 	}
 	
-	public void setPrice() {
+	public void setPrice(Integer price) {
 		this.price=price;
 	}
 }
