@@ -30,7 +30,8 @@ public class ItemController {
 	@GetMapping
 	public String index(Model model) {
 		//データの疎通確認
-		List<Item> items=this.itemService.findAll();//画面で利用する変数としてitemsをセット
+		//DELETED_ATがnullのデータのみを検索
+		List<Item> items=this.itemService.findByDeletedAtIsNull();//画面で利用する変数としてitemsをセット
 		//コンソールよりListの中身を確認
 		//System.out.println(items.toString());
 		model.addAttribute("items", items);
