@@ -54,14 +54,27 @@ public class ItemController {
 	//商品編集ページ
 	@GetMapping("henshu/{id}")
 	public String henshuPage(@PathVariable("id") Integer id, Model model, @ModelAttribute("itemForm") ItemForm itemForm) {
-		//処理を追加
+		//Entityクラスのインスタンスをidより検索し、取得
+		Item item=this.itemService.findById(id);
+		//フィールドのセット
+		itemForm.setName(item.getName());
+		itemForm.setPrice(item.getPrice());
+		model.addAttribute("id", id);
 		return "item/henshuPage";
 	}
 	
 	//商品編集の実行
 	@PostMapping("henshu/{id}")
 	public String henshu(@PathVariable("id") Integer id, @ModelAttribute("itemForm") ItemForm itemForm) {
-		//処理を追加
+		this.itemService.update(id, itemForm);
 		return "redirect:/item";
 	}
+	
+	//商品削除
+	@PostMapping("sakujo/{id}")
+	public String sakujo(@PathVariable("id") Integer id) {
+		this.itemService.delete(id);
+		return "redirect:/item";
+	}
+	
 }
