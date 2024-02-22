@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.entity.Category;
 import com.example.entity.Item;
 import com.example.form.ItemForm;
+import com.example.service.CategoryService;
 import com.example.service.ItemService;
 
 @Controller
@@ -20,10 +23,14 @@ import com.example.service.ItemService;
 public class ItemController {
 
 	private final ItemService itemService;
+	//CategoryServiceをコンストラクタインジェクションする
+	private final CategoryService categoryService;
+
 	
 	@Autowired
-	public ItemController(ItemService itemService) {
+	public ItemController(ItemService itemService, CategoryService categoryService) {
 		this.itemService=itemService;
+		this.categoryService=categoryService;
 	}
 	
 	//商品一覧の表示
@@ -40,7 +47,11 @@ public class ItemController {
 	
 	//商品登録ページ表示
 	@GetMapping("toroku")
-	public String torokuPage(@ModelAttribute("itemForm") ItemForm itemForm) {
+	public String torokuPage(@ModelAttribute("itemForm") ItemForm itemForm, Model model) {
+		//Categoryモデルから一覧を取得する
+		List<Category> categories=this.categoryService.findAll();
+		//viewにカテゴリーを渡す
+		model.addAttribute("categories", categories);
 		//templates/items/torokuPage.htmlを表示
 		return "item/torokuPage";
 	}
@@ -60,7 +71,12 @@ public class ItemController {
 		//フィールドのセット
 		itemForm.setName(item.getName());
 		itemForm.setPrice(item.getPrice());
+		itemForm.setCategoryId(item.getCategoryId());
+		
+		//Categoryモデルから一覧を取得する
+		List<Category> categories=this.categoryService.findAll();
 		model.addAttribute("id", id);
+		model.addAttribute("categories", categories);
 		return "item/henshuPage";
 	}
 	
@@ -78,4 +94,19 @@ public class ItemController {
 		return "redirect:/item";
 	}
 	
+	//送信ボタンのname属性がinの場合は入荷処理の実行
+	@PostMapping(path="stock/{id}", params="in")
+	public String nyuka(@PathVariable("id") Integer id, @RequestParam("stock") Integer inputValue) {
+		//入荷処理
+		this.itemService.nyuka(id, inputValue);
+		return "redirect:/item";
+	}
+	
+	//送信ボタンのname属性がoutの場合は出荷処理の実行
+	@PostMapping(path="stock/{id}", params="out")
+	public String shukka(@PathVariable("id") Integer id, @RequestParam("stock") Integer inputValue) {
+		//出荷処理
+		this.itemService.shukka(id, inputValue);
+		return "redirect:/item";
+	}
 }
